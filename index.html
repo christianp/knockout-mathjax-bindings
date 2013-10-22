@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>knockout.js MathJax binding handler</title>
+
+		<!-- knockout -->
+		<script type="text/javascript" src="js/knockout-2.3.0.js"></script>
+
+		<!-- normalise.css -->
+		<link rel="stylesheet" href="http://css.cdn.tl/normalize.css"></link>
+
+		<!-- MathJax -->
+		<script type="text/x-mathjax-config">
+			MathJax.Hub.Config({
+				tex2jax: {
+					inlineMath: [ ['$','$'], ['\\(','\\)'] ]
+				}
+			});
+		</script>
+		<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML.js"></script>
+
+		<script type="text/javascript" src="js/thing.js"></script>
+		<link rel="stylesheet" href="css/thing.css"></link>
+	</head>
+	<body>
+		<section>
+			<p>Enter TeX in this box:</p>
+			<textarea data-bind="value: tex, valueUpdate: 'afterkeydown'" id="input-tex"></textarea>
+		</section>
+
+		<section>
+			<p>It's displayed here using the <code>maths</code> binding: </p>
+			<p><code>&lt;span data-bind="maths: tex"&gt;&lt;/span&gt;</code> <span data-bind="maths: tex"></span></p>
+			<p>And here it is in display mode:</p>
+			<p><code>&lt;div data-bind="maths: tex, displayMaths: true"&gt;&lt;/div&gt;</code></p>
+			<div class="output" data-bind="maths: tex, displayMaths: true"></div>
+		</section>
+
+		<section>
+			<p>Enter any HTML, with maths delimited by <code>$ ... $</code> or <code>\[ ... \]</code>, in this box.</p>
+			<textarea data-bind="value: content, valueUpdate: 'afterkeydown'"></textarea>
+		</section>
+
+		<section>
+			<p>It's displayed here using the <code>latex</code> binding.</p>
+			<div class="output" data-bind="latex: content"></div>
+		</section>
+
+		<section>
+			<p>Here's the code for the Knockout binding handlers used above.</p>
+			<pre>
+ko.bindingHandlers.latex = {
+	update: function(element,valueAccessor) {
+		ko.bindingHandlers.html.update.apply(this,arguments);
+		MathJax.Hub.Queue(['Typeset',MathJax.Hub,element]);
+	}
+}
+
+ko.bindingHandlers.maths = {
+	update: function(element,valueAccessor,allBindingsAccessor) {
+		var val = ko.utils.unwrapObservable(valueAccessor());
+		var display = allBindingsAccessor()['displayMaths'];
+		var scriptTag = document.createElement('script');
+		scriptTag.setAttribute('type','math/tex' + (display ? '; mode=display': ''));
+		scriptTag.text = val;
+		element.innerHTML = '';
+		element.appendChild(scriptTag);
+		MathJax.Hub.Queue(['Typeset',MathJax.Hub,element]);
+	}
+}
+			</pre>
+		</section>
+
+	</body>
+</html>
+
+
+
