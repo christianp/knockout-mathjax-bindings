@@ -10,7 +10,7 @@ ko.bindingHandlers.latex = {
 //if the additional binding `displayMaths: true` is given, the maths is typeset in display mode (on its own line and bigger)
 ko.bindingHandlers.maths = {
 	update: function(element,valueAccessor,allBindingsAccessor) {
-		var val = ko.utils.unwrapObservable(valueAccessor());
+		var val = ko.unwrap(valueAccessor());
 		var display = allBindingsAccessor()['displayMaths'];
 		var scriptTag = document.createElement('script');
 		scriptTag.setAttribute('type','math/tex' + (display ? '; mode=display': ''));
